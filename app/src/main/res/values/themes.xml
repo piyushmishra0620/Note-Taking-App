@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Note" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Note" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Theme.Start" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">?android:attr/colorBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_animator</item>
+        <item name="windowSplashScreenAnimationDuration">2600</item>
+        <item name="postSplashScreenTheme">@style/Theme.Note</item>
+    </style>
 </resources>
