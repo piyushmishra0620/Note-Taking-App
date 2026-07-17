@@ -28,6 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.note.ui.theme.borderStroke
 import com.example.note.ui.theme.fabColor
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.window.PopupProperties
+
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,11 +51,34 @@ class MainActivity : ComponentActivity() {
                     TopAppBar(title={
                         Text(text="Notes",fontWeight= FontWeight.Bold,fontSize=25.sp)
                     },actions={
+                        var expanded by rememberSaveable{
+                            mutableStateOf(false)
+                        }
                         IconButton(onClick={}) {
                             Icon(Icons.Filled.Search,contentDescription="Search",modifier=Modifier.size(32.dp))
                         }
-                        IconButton(onClick={}) {
+                        IconButton(onClick={expanded=!(expanded)}) {
                             Icon(Icons.Filled.MoreVert,contentDescription="",modifier=Modifier.size(32.dp))
+                        }
+                        DropdownMenu(
+                            expanded=expanded,
+                            onDismissRequest={expanded=false},
+                            offset = DpOffset(x = (-12).dp, y = 0.dp),
+                            modifier = Modifier.padding(end=6.dp,start=6.dp),
+                            shadowElevation=6.dp,
+                            border=BorderStroke(1.dp, MaterialTheme.colorScheme.onTertiary),
+                            shape=RoundedCornerShape(10.dp),
+                            containerColor=MaterialTheme.colorScheme.background
+                        ){
+                            DropdownMenuItem(text={Text("Edit",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
+                            DropdownMenuItem(text={Text("List View",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
+                            DropdownMenuItem(text={Text("Grid View",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
+                            DropdownMenuItem(text={Text("Sort by time created",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
+                            DropdownMenuItem(text={Text("Sort by time edited",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
                         }
                     },
                         colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.Transparent,titleContentColor=MaterialTheme.colorScheme.onSurface,actionIconContentColor=MaterialTheme.colorScheme.onSurface),
