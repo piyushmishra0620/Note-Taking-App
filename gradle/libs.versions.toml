@@ -12,6 +12,7 @@ coreSplashscreen = "1.2.0"
 material = "1.14.0"
 uiGraphics = "1.11.4"
 composeShadowsPlus = "1.0.3"
+foundation = "1.11.4"
 
 [libraries]
 compose-shadows-plus = { group = "com.github.GIGAMOLE", name = "ComposeShadowsPlus", version.ref = "composeShadowsPlus" }
@@ -34,6 +35,7 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -20,7 +20,9 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = blackBlur,
     onSecondary=borderStroke,
     onTertiary=blackBlur,
-    background=backgroundColor
+    background=Color.Black,
+    surface=Color.Black,
+    surfaceVariant=Color(0xFF1C1B1F)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -30,7 +32,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface=Color.Black,
     onPrimary=whiteBlur,
     onSecondary=whiteborderStroke,
-    background=whiteBackgroundColor,
+    background=Color.White,
     onTertiary=whiteBlur
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -47,7 +49,7 @@ private val LightColorScheme = lightColorScheme(
 fun NoteTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

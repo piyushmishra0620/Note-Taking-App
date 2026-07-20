@@ -32,7 +32,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +56,17 @@ class MainActivity : ComponentActivity() {
                         var expanded by rememberSaveable{
                             mutableStateOf(false)
                         }
+                        var view by rememberSaveable{
+                            mutableStateOf("List View")
+                        }
+                        var menuText by remember {
+                            mutableStateOf(view)
+                        }
+                        LaunchedEffect(expanded){
+                            if(expanded){
+                                menuText=view
+                            }
+                        }
                         IconButton(onClick={}) {
                             Icon(Icons.Filled.Search,contentDescription="Search",modifier=Modifier.size(32.dp))
                         }
@@ -66,26 +79,25 @@ class MainActivity : ComponentActivity() {
                             offset = DpOffset(x = (-12).dp, y = 0.dp),
                             modifier = Modifier.padding(end=6.dp,start=6.dp),
                             shadowElevation=6.dp,
-                            border=BorderStroke(1.dp, MaterialTheme.colorScheme.onTertiary),
+                            border=BorderStroke(3.dp, MaterialTheme.colorScheme.onTertiary),
                             shape=RoundedCornerShape(10.dp),
                             containerColor=MaterialTheme.colorScheme.background
                         ){
-                            DropdownMenuItem(text={Text("Edit",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            DropdownMenuItem(text={Text("Edit",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
                             HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("List View",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            DropdownMenuItem(text={Text(menuText,color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={ expanded=false
+                                view= if(view=="List View") "Grid View" else "List View"})
                             HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("Grid View",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            DropdownMenuItem(text={Text("Sort by time created",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
                             HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("Sort by time created",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
-                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("Sort by time edited",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={})
+                            DropdownMenuItem(text={Text("Sort by time edited",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
                         }
                     },
                         colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.Transparent,titleContentColor=MaterialTheme.colorScheme.onSurface,actionIconContentColor=MaterialTheme.colorScheme.onSurface),
                         scrollBehavior=TopAppBarDefaults.pinnedScrollBehavior())
                 },
                     bottomBar={
-                        BottomAppBar(modifier=Modifier.height(130.dp).padding(bottom=20.dp,start=30.dp,end=30.dp,top=8.dp).navigationBarsPadding().clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.onPrimary).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(20.dp)),actions={
+                        BottomAppBar(modifier=Modifier.height(115.dp).padding(bottom=20.dp,start=30.dp,end=30.dp,top=8.dp).navigationBarsPadding().clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.onPrimary).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(20.dp)).dropShadow(shape=RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),actions={
                             Spacer(Modifier.weight(0.25f))
                             IconButton(onClick={},Modifier.size(50.dp)){
                                 Column(Modifier,horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center){
@@ -105,15 +117,23 @@ class MainActivity : ComponentActivity() {
                         },contentColor=MaterialTheme.colorScheme.onSurface)
                     },
                     floatingActionButton={
+                        val interactSource = remember{MutableInteractionSource()}
+                        val pressed by interactSource.collectIsPressedAsState()
+                        val scale by animateFloatAsState(
+                            targetValue= if(pressed) 0.85f else 1f,
+                            label="button_scale"
+                        )
                         val fabShape = RoundedCornerShape(50.dp)
                         FloatingActionButton(
                             onClick={},
                             shape= fabShape,
                             containerColor=fabColor,
                             contentColor=MaterialTheme.colorScheme.onSurface,
+                            interactionSource = interactSource,
+
                             modifier=Modifier
                                 .dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107)))
-                                .border(2.dp,MaterialTheme.colorScheme.onSurface, fabShape)
+                                .border(1.dp,MaterialTheme.colorScheme.onSurface, fabShape).scale(scale)
                         ){
                             Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
                         }
@@ -128,7 +148,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(modifier:Modifier=Modifier,name:String){
-    Text(text="Hello, $name!", modifier = modifier)
+    Text(text="Hello, $name!", modifier = modifier,color=MaterialTheme.colorScheme.onSurface)
 }
 
 @Preview(showBackground = true)

@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.compose.shadows.plus)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.material)
