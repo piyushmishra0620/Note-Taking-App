@@ -111,7 +111,6 @@ class MainActivity : ComponentActivity() {
                                     Icon(Icons.Filled.Task,contentDescription="Todo",modifier=Modifier.size(28.dp))
                                     Text(text="To-dos",fontSize=12.sp,fontWeight=FontWeight.Normal)
                                 }
-
                             }
                             Spacer(Modifier.weight(0.25f))
                         },contentColor=MaterialTheme.colorScheme.onSurface)
@@ -120,8 +119,12 @@ class MainActivity : ComponentActivity() {
                         val interactSource = remember{MutableInteractionSource()}
                         val pressed by interactSource.collectIsPressedAsState()
                         val scale by animateFloatAsState(
-                            targetValue= if(pressed) 0.85f else 1f,
-                            label="button_scale"
+                            targetValue= if(pressed) 0.92f else 1f,
+                            label="button_scale",
+                            animationSpec = spring(
+                                stiffness=Spring.StiffnessLow,
+                                dampingRatio=Spring.DampingRatioLowBouncy
+                            )
                         )
                         val fabShape = RoundedCornerShape(50.dp)
                         FloatingActionButton(
@@ -130,10 +133,9 @@ class MainActivity : ComponentActivity() {
                             containerColor=fabColor,
                             contentColor=MaterialTheme.colorScheme.onSurface,
                             interactionSource = interactSource,
-
-                            modifier=Modifier
+                            modifier=Modifier.scale(scale)
                                 .dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107)))
-                                .border(1.dp,MaterialTheme.colorScheme.onSurface, fabShape).scale(scale)
+                                .border(1.dp,MaterialTheme.colorScheme.onSurface, fabShape)
                         ){
                             Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
                         }

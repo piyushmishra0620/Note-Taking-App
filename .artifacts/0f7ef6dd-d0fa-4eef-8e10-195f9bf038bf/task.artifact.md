@@ -1,0 +1,4 @@
+- `[x]` Update `libs.versions.toml` with KSP version
+- `[x]` Update root `build.gradle.kts` with common plugins
+- `[x]` Update app `build.gradle.kts` with Room dependencies and configuration
+- `[x]` Verify build and sync
