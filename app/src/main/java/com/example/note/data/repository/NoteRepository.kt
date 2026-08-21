@@ -3,18 +3,31 @@ package com.example.note.data.repository
 import com.example.note.data.local.dao.NoteDAO
 import com.example.note.data.local.entities.Notes
 import kotlinx.coroutines.flow.*
+import androidx.paging.*
 
-class NoteRepository(private val noteDao: NoteDAO) {
-    suspend fun insertNote(note:Notes){
+interface NoteRepositoryInterface{
+    suspend fun insertNote(note:Notes)
+    suspend fun updateNote(note:Notes)
+    suspend fun deleteNotes(note:List<Notes>)
+    fun retrieveNotesInChunks():Flow<PagingData<Notes>>
+}
+
+class NoteRepository(private val noteDao: NoteDAO): NoteRepositoryInterface {
+    override suspend fun insertNote(note:Notes){
         noteDao.insertNote(note)
     }
-    suspend fun updateNote(note:Notes){
+    override suspend fun updateNote(note:Notes){
         noteDao.updateNote(note)
     }
-    suspend fun deleteNote(note:List<Notes>){
+    override suspend fun deleteNotes(note:List<Notes>){
         noteDao.deleteNote(note)
     }
-    suspend fun retrieveNotesInChunks(offset:Int):Flow<List<Notes>>{
-        return noteDao.retrieveNotesInChunks(offset)
+    override fun retrieveNotesInChunks():Flow<PagingData<Notes>>{
+        return Pager<Int,Notes>(
+            config=PagingConfig(
+                pageSize=10
+            ),
+            pagingSourceFactory={noteDao.retrieveNotesInChunks()}
+        ).flow
     }
 }

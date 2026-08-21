@@ -3,6 +3,7 @@ package com.example.note.data.local.dao
 import androidx.room.*;
 import com.example.note.data.local.entities.Todos;
 import kotlinx.coroutines.flow.*
+import androidx.paging.PagingSource
 
 @Dao
 interface TodoDAO {
@@ -15,6 +16,6 @@ interface TodoDAO {
     @Delete
     suspend fun deleteTodos(todo:List<Todos>)
 
-    @Query("SELECT * FROM Todos LIMIT 10 OFFSET :offset")
-    suspend fun retrieveTodosInChunks(offset:Int):Flow<List<Todos>>
+    @Query("SELECT * FROM Todos")
+    fun retrieveTodosInChunks():PagingSource<Int,Todos>
 }

@@ -3,6 +3,7 @@ package com.example.note.data.local.dao
 import androidx.room.*
 import com.example.note.data.local.entities.Notes
 import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 
 @Dao
 interface NoteDAO {
@@ -15,6 +16,6 @@ interface NoteDAO {
     @Delete
     suspend fun deleteNote(notes:List<Notes>)
 
-    @Query("SELECT * FROM Notes LIMIT 10 OFFSET :offset")
-    suspend fun retrieveNotesInChunks(offset:Int): Flow<List<Notes>>
+    @Query("SELECT * FROM Notes")
+    fun retrieveNotesInChunks(): PagingSource<Int,Notes>
 }
