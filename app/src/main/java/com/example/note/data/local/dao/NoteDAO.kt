@@ -2,6 +2,7 @@ package com.example.note.data.local.dao
 
 import androidx.room.*
 import com.example.note.data.local.entities.Notes
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDAO {
@@ -12,7 +13,8 @@ interface NoteDAO {
     suspend fun updateNote(note:Notes)
 
     @Delete
-    suspend fun deleteNote(note:Notes)
+    suspend fun deleteNote(notes:List<Notes>)
 
-
+    @Query("SELECT * FROM Notes LIMIT 10 OFFSET :offset")
+    suspend fun retrieveNotesInChunks(offset:Int): Flow<List<Notes>>
 }

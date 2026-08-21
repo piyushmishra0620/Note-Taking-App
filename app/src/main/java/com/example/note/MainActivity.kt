@@ -1,17 +1,14 @@
 package com.example.note
 
 import android.os.Bundle
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import androidx.activity.*
 import androidx.activity.compose.*
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.example.note.ui.theme.NoteTheme
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,126 +32,77 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.navigation3.runtime.*;
+import androidx.navigation3.ui.*;
+import androidx.navigation3.scene.*;
+import com.example.note.navigation.*;
+import com.example.note.screens.*;
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashscreen = installSplashScreen()
         splashscreen.setOnExitAnimationListener{splashScreenView->
-                splashScreenView.view.animate().setStartDelay(20).setDuration(80).alpha(0f).translationYBy(-600f)
+                splashScreenView.view.animate().setStartDelay(20).setDuration(80).alpha(0f).scaleX(0f).scaleY(0f)
                     .setInterpolator(DecelerateInterpolator())
                     .withEndAction { splashScreenView.remove() }.start()
             }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent{
+            val backStack = rememberNavBackStack(Notes);
             NoteTheme{
-                Scaffold(modifier=Modifier.fillMaxSize(),topBar={
-                    TopAppBar(title={
-                        Text(text="Notes",fontWeight= FontWeight.Bold,fontSize=25.sp)
-                    },actions={
-                        var expanded by rememberSaveable{
-                            mutableStateOf(false)
-                        }
-                        var view by rememberSaveable{
-                            mutableStateOf("List View")
-                        }
-                        var menuText by remember {
-                            mutableStateOf(view)
-                        }
-                        LaunchedEffect(expanded){
-                            if(expanded){
-                                menuText=view
-                            }
-                        }
-                        IconButton(onClick={}) {
-                            Icon(Icons.Filled.Search,contentDescription="Search",modifier=Modifier.size(32.dp))
-                        }
-                        IconButton(onClick={expanded=!(expanded)}) {
-                            Icon(Icons.Filled.MoreVert,contentDescription="",modifier=Modifier.size(32.dp))
-                        }
-                        DropdownMenu(
-                            expanded=expanded,
-                            onDismissRequest={expanded=false},
-                            offset = DpOffset(x = (-12).dp, y = 0.dp),
-                            modifier = Modifier.padding(end=6.dp,start=6.dp),
-                            shadowElevation=6.dp,
-                            border=BorderStroke(3.dp, MaterialTheme.colorScheme.onTertiary),
-                            shape=RoundedCornerShape(10.dp),
-                            containerColor=MaterialTheme.colorScheme.background
-                        ){
-                            DropdownMenuItem(text={Text("Edit",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
-                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text(menuText,color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={ expanded=false
-                                view= if(view=="List View") "Grid View" else "List View"})
-                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("Sort by time created",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
-                            HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                            DropdownMenuItem(text={Text("Sort by time edited",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
-                        }
-                    },
-                        colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.Transparent,titleContentColor=MaterialTheme.colorScheme.onSurface,actionIconContentColor=MaterialTheme.colorScheme.onSurface),
-                        scrollBehavior=TopAppBarDefaults.pinnedScrollBehavior())
-                },
+                Scaffold(modifier=Modifier.fillMaxSize(),
                     bottomBar={
-                        BottomAppBar(modifier=Modifier.height(115.dp).padding(bottom=20.dp,start=30.dp,end=30.dp,top=8.dp).navigationBarsPadding().clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.onPrimary).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(20.dp)).dropShadow(shape=RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),actions={
+                        BottomAppBar(modifier=Modifier.height(115.dp).padding(bottom=15.dp,start=15.dp,end=15.dp,top=8.dp).navigationBarsPadding().clip(RoundedCornerShape(20.dp)).border(2.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(20.dp)).dropShadow(shape=RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),actions={
                             Spacer(Modifier.weight(0.25f))
-                            IconButton(onClick={},Modifier.size(50.dp)){
+                            IconButton(onClick={
+                                if(backStack.lastOrNull()!=Notes) {
+                                    backStack.add(Notes);
+                                }
+                            },Modifier.size(50.dp)){
                                 Column(Modifier,horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center){
                                     Icon(Icons.Filled.EditNote,contentDescription="Notes",modifier=Modifier.size(28.dp))
                                     Text(text="Notes",fontSize=12.sp,fontWeight=FontWeight.Normal)
                                 }
                             }
                             Spacer(Modifier.weight(0.5f))
-                            IconButton(onClick={},Modifier.size(53.dp)) {
+                            IconButton(onClick={
+                                if(backStack.lastOrNull()!=Todos) {
+                                    backStack.add(Todos);
+                                }
+                            },Modifier.size(53.dp)) {
                                 Column(Modifier,horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center){
                                     Icon(Icons.Filled.Task,contentDescription="Todo",modifier=Modifier.size(28.dp))
                                     Text(text="To-dos",fontSize=12.sp,fontWeight=FontWeight.Normal)
                                 }
                             }
                             Spacer(Modifier.weight(0.25f))
-                        },contentColor=MaterialTheme.colorScheme.onSurface)
-                    },
-                    floatingActionButton={
-                        val interactSource = remember{MutableInteractionSource()}
-                        val pressed by interactSource.collectIsPressedAsState()
-                        val scale by animateFloatAsState(
-                            targetValue= if(pressed) 0.92f else 1f,
-                            label="button_scale",
-                            animationSpec = spring(
-                                stiffness=Spring.StiffnessLow,
-                                dampingRatio=Spring.DampingRatioLowBouncy
-                            )
-                        )
-                        val fabShape = RoundedCornerShape(50.dp)
-                        FloatingActionButton(
-                            onClick={},
-                            shape= fabShape,
-                            containerColor=fabColor,
-                            contentColor=MaterialTheme.colorScheme.onSurface,
-                            interactionSource = interactSource,
-                            modifier=Modifier.scale(scale)
-                                .dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107)))
-                                .border(1.dp,MaterialTheme.colorScheme.onSurface, fabShape)
-                        ){
-                            Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
-                        }
-                    },
-                    floatingActionButtonPosition=FabPosition.End){
-                    innerPadding->Greeting(modifier=Modifier.padding(innerPadding),"Android")
+                        },contentColor=MaterialTheme.colorScheme.onSurface,containerColor=MaterialTheme.colorScheme.onPrimary)
+                    }){
+                    innerPadding->NavDisplay(
+                        backStack=backStack,
+                        onBack={
+                            backStack.removeLastOrNull()
+                        },
+                        entryProvider=entryProvider{
+                            entry<Notes>{
+                                NoteScreen(backStack)
+                            }
+                            entry<Todos>{
+                                TodoScreen()
+                            }
+                            entry<Note>{
+                                Note()
+                            }
+                            entry<Search>{
+                                Search()
+                            }
+                        },
+                        modifier=Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(modifier:Modifier=Modifier,name:String){
-    Text(text="Hello, $name!", modifier = modifier,color=MaterialTheme.colorScheme.onSurface)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MyScreenPreview(){
-    Greeting(name="Android")
 }

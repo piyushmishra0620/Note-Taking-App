@@ -1,31 +1,27 @@
-# Implementation Plan - Add Room and KSP Dependencies
+# Implementation Plan - Resolve Material 3 TopAppBar Experimental Status
 
-This plan adds the necessary plugins and dependencies for Room database and KSP (Kotlin Symbol Processing) to the project, as per the recent updates in the version catalog.
+The goal is to resolve the "experimental" status issue with `TopAppBar` and other Material 3 components in `MainActivity.kt` and `NoteScreen.kt`.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **KSP Version:** I have set the KSP version to `2.3.10` to maintain compatibility with Kotlin `2.4.10` as per current release mappings.
+> [!NOTE]
+> Since many `TopAppBar` features (like `scrollBehavior`) are still marked as experimental in current versions of Material 3, the most direct way to resolve this is to use the `@OptIn` annotation. Alternatively, we can check if a more recent stable version of Material 3 is available that has stabilized these APIs.
 
 ## Proposed Changes
 
-### Build Configuration
+### UI Layer
 
-#### [MODIFY] [libs.versions.toml](file:///C:/Users/piyus/AndroidStudioProjects/Note/gradle/libs.versions.toml)
-- Replace the placeholder `<kotlinCompatibleKspVersion>` with `2.3.10`.
+#### [MODIFY] [NoteScreen.kt](file:///C:/Users/piyus/AndroidStudioProjects/Note/app/src/main/java/com/example/note/screens/NoteScreen.kt)
+- Add `@OptIn(ExperimentalMaterial3Api::class)` to the `NoteScreen` composable function.
+- Fix the syntax error in the `Scaffold` call (the missing `floatingActionButton` value and the content lambda).
 
-#### [MODIFY] [build.gradle.kts (root)](file:///C:/Users/piyus/AndroidStudioProjects/Note/build.gradle.kts)
-- Add `ksp`, `androidx-room`, and `kotlin-serialization` plugins to the top-level `plugins` block with `apply false`. This centralizes version management for all modules.
-
-#### [MODIFY] [build.gradle.kts (app)](file:///C:/Users/piyus/AndroidStudioProjects/Note/app/build.gradle.kts)
-- Add Room dependencies: `androidx-room-runtime`, `androidx-room-compiler` (via KSP), and `androidx-sqlite-bundled`.
-- Configure the `room` extension to set the schema directory, which is required by the Room Gradle plugin.
+#### [MODIFY] [MainActivity.kt](file:///C:/Users/piyus/AndroidStudioProjects/Note/app/src/main/java/com/example/note/MainActivity.kt)
+- Ensure `@OptIn(ExperimentalMaterial3Api::class)` is applied where needed (it was already on the `onCreate` method in the base file).
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew build` to ensure all dependencies are correctly resolved and the annotation processing works.
-- Verify that the Room schema directory is created/accessible during the build.
+- Run `analyze_file` on both files to ensure no "Experimental API usage" errors remain.
 
 ### Manual Verification
-- Sync the project with Gradle files in Android Studio and check for any sync errors.
+- Verify the UI renders correctly in the Preview and on a device.
