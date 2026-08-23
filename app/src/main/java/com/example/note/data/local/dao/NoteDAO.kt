@@ -2,7 +2,6 @@ package com.example.note.data.local.dao
 
 import androidx.room.*
 import com.example.note.data.local.entities.Notes
-import kotlinx.coroutines.flow.Flow
 import androidx.paging.PagingSource
 
 @Dao

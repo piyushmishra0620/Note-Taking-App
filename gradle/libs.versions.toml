@@ -32,6 +32,7 @@ compose-shadows-plus = { group = "com.github.GIGAMOLE", name = "ComposeShadowsPl
 androidx-sqlite-bundled={module="androidx.sqlite:sqlite-bundled",version.ref="sqlite"}
 androidx-room-runtime={module="androidx.room:room-runtime",version.ref="room"}
 androidx-room-compiler={module="androidx.room:room-compiler",version.ref="room"}
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-room-sqlite-wrapper={module="androidx.room:room-sqlite-wrapper",version.ref="room"}
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

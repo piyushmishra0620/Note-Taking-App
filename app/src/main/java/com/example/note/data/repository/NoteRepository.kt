@@ -22,12 +22,12 @@ class NoteRepository(private val noteDao: NoteDAO): NoteRepositoryInterface {
     override suspend fun deleteNotes(note:List<Notes>){
         noteDao.deleteNote(note)
     }
-    override fun retrieveNotesInChunks():Flow<PagingData<Notes>>{
-        return Pager<Int,Notes>(
-            config=PagingConfig(
-                pageSize=10
-            ),
-            pagingSourceFactory={noteDao.retrieveNotesInChunks()}
-        ).flow
-    }
+    override fun retrieveNotesInChunks(): Flow<PagingData<Notes>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            prefetchDistance=3,
+            initialLoadSize=10
+        ),
+        pagingSourceFactory = { noteDao.retrieveNotesInChunks() }
+    ).flow
 }

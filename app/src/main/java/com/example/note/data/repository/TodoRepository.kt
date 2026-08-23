@@ -19,15 +19,15 @@ class TodoRepository(private val todoDao:TodoDAO): TodoRepositoryInterface {
     override suspend fun updateTodo(todo:Todos){
         todoDao.updateTodos(todo)
     }
-    override suspend fun deleteTodos(todo:List<Todos>){
-        todoDao.deleteTodos(todo)
+    override suspend fun deleteTodos(todos:List<Todos>){
+        todoDao.deleteTodos(todos)
     }
-    override fun retrieveTodosInChunks():Flow<PagingData<Todos>>{
-        return Pager<Int,Todos>(
-            config=PagingConfig(
-                pageSize=10
-            ),
-            pagingSourceFactory={todoDao.retrieveTodosInChunks()}
-        ).flow
-    }
+    override fun retrieveTodosInChunks(): Flow<PagingData<Todos>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            prefetchDistance=3,
+            initialLoadSize=10
+        ),
+        pagingSourceFactory = { todoDao.retrieveTodosInChunks() }
+    ).flow
 }

@@ -22,12 +22,14 @@ import androidx.compose.foundation.shape.*
 import androidx.compose.animation.core.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.*
 import com.example.note.navigation.*
+import com.example.note.viewmodels.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteScreen(backStack: NavBackStack<NavKey>){
+fun NoteScreen(backStack: NavBackStack<NavKey>,viewmodel:NoteViewModel=viewModel()){
     Scaffold(modifier=Modifier.fillMaxSize(),topBar={
         TopAppBar(title={
             Text(text="Notes",fontWeight=FontWeight.Bold,fontSize=25.sp)
@@ -44,6 +46,17 @@ fun NoteScreen(backStack: NavBackStack<NavKey>){
             LaunchedEffect(expanded){
                 if(expanded){
                     menuText=view
+                }
+            }
+            var sort by rememberSaveable{
+                mutableStateOf("Sort by time created")
+            }
+            var sortText by remember{
+                mutableStateOf(sort)
+            }
+            LaunchedEffect(expanded){
+                if(expanded){
+                    sortText=sort
                 }
             }
             IconButton(onClick={
@@ -73,7 +86,10 @@ fun NoteScreen(backStack: NavBackStack<NavKey>){
                     view = if(view=="List View") "Grid View" else "List View"
                 })
                 HorizontalDivider(thickness=Dp.Hairline,color=MaterialTheme.colorScheme.onTertiary)
-                DropdownMenuItem(text={Text("Sort by time created",color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={expanded=false})
+                DropdownMenuItem(text={Text(sortText,color=MaterialTheme.colorScheme.onSurface,fontSize=16.sp,fontWeight=FontWeight.SemiBold)},onClick={
+                    expanded=false
+                    sort = if(sort=="Sort by time created") "Sort by time edited" else "Sort by time created"
+                })
             }
         },
             colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.Transparent,titleContentColor=MaterialTheme.colorScheme.onSurface,actionIconContentColor=MaterialTheme.colorScheme.onSurface),
@@ -110,5 +126,5 @@ fun NoteScreen(backStack: NavBackStack<NavKey>){
 @Preview(showBackground=true)
 @Composable
 fun NoteScreenPreview(){
-    NoteScreen(backStack = rememberNavBackStack(Notes))
+    NoteScreen(backStack = rememberNavBackStack(Notes), viewModel())
 }

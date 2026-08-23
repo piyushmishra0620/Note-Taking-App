@@ -20,10 +20,13 @@ import androidx.compose.animation.*;
 import androidx.compose.animation.core.*;
 import androidx.compose.ui.draw.*;
 import androidx.compose.ui.graphics.shadow.Shadow;
+import com.example.note.viewmodels.TodoViewModel
+import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodoScreen(){
+fun TodoScreen(todoViewModel:TodoViewModel=viewModel()){
     Scaffold(
         topBar={
             TopAppBar(
@@ -62,5 +65,5 @@ fun TodoScreen(){
 @Preview(showBackground=true)
 @Composable
 fun TodoScreenPreview(){
-    TodoScreen();
+    TodoScreen(viewModel())
 }
