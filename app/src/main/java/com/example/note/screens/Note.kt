@@ -20,10 +20,16 @@ import androidx.compose.ui.tooling.preview.Preview;
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.note.viewmodels.NoteViewModel
+import androidx.navigation3.*
+import androidx.navigation3.runtime.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Note() {
+fun Note(navBackStack:NavBackStack<NavKey>,viewModel:NoteViewModel= viewModel()) {
     Scaffold(
         modifier = Modifier.fillMaxSize(), topBar = {
             var expanded by rememberSaveable {
@@ -32,20 +38,24 @@ fun Note() {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "")
+                    IconButton(onClick={
+                        navBackStack.removeLastOrNull()
+                    }){
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack,contentDescription="",modifier=Modifier.size(28.dp))
+                    }
                 },
                 actions = {
                     IconButton(onClick = {}) {
-                        Icon(Icons.Filled.Share, contentDescription = "")
+                        Icon(Icons.Filled.Share, contentDescription = "",modifier=Modifier.size(28.dp))
                     }
                     IconButton(onClick = { expanded = !(expanded) }) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "")
+                        Icon(Icons.Filled.MoreVert, contentDescription = "",modifier=Modifier.size(28.dp))
                     }
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                         offset = DpOffset(x = (-12).dp, y = 0.dp),
-                        modifier = Modifier.padding(end = 6.dp, start = 6.dp),
+                        modifier = Modifier.padding(end = 6.dp, start = 6.dp).size(180.dp,163.dp),
                         shadowElevation = 6.dp,
                         border = BorderStroke(3.dp, MaterialTheme.colorScheme.onTertiary),
                         shape = RoundedCornerShape(10.dp),
@@ -94,22 +104,22 @@ fun Note() {
         },
         bottomBar = {
             BottomAppBar(
-                modifier=Modifier.height(115.dp).padding(bottom=25.dp,start=20.dp,end=20.dp,top=12.dp).navigationBarsPadding().clip(RoundedCornerShape(40.dp)).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(40.dp)).dropShadow(shape= RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),
+                modifier=Modifier.height(115.dp).padding(bottom=25.dp,start=55.dp,end=55.dp,top=25.dp).navigationBarsPadding().clip(RoundedCornerShape(40.dp)).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(40.dp)).dropShadow(shape= RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),
                 actions={
                      Row(verticalAlignment=Alignment.CenterVertically){
-                         Spacer(modifier=Modifier.weight(0.15f))
+                         Spacer(modifier=Modifier.weight(0.1f))
                          IconButton(onClick={}){
-                             Icon(Icons.Filled.Edit,contentDescription="Edit Note")
+                             Icon(Icons.Filled.Edit,contentDescription="Edit Note",modifier=Modifier.size(24.dp))
                          }
-                         Spacer(modifier=Modifier.weight(0.15f))
+                         Spacer(modifier=Modifier.weight(0.1f))
                          IconButton(onClick={}){
-                             Icon(Icons.Filled.KeyboardVoice,contentDescription="voice")
+                             Icon(Icons.Filled.KeyboardVoice,contentDescription="voice",modifier=Modifier.size(24.dp))
                          }
-                         Spacer(modifier=Modifier.weight(0.15f))
+                         Spacer(modifier=Modifier.weight(0.1f))
                          IconButton(onClick={}){
-                             Icon(Icons.Filled.ControlPoint,contentDescription="visuals")
+                             Icon(Icons.Filled.ControlPoint,contentDescription="visuals",modifier=Modifier.size(24.dp))
                          }
-                         Spacer(modifier=Modifier.weight(0.15f))
+                         Spacer(modifier=Modifier.weight(0.1f))
                      }
                 },
                 contentColor=MaterialTheme.colorScheme.onSurface,
@@ -125,5 +135,5 @@ fun Note() {
 @Preview(showBackground = true)
 @Composable
 fun NotePreview() {
-    Note();
+    Note(rememberNavBackStack(),viewModel());
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.*
 import com.example.note.navigation.*
+import com.example.note.ui.theme.fabColor
 import com.example.note.viewmodels.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +111,7 @@ fun NoteScreen(backStack: NavBackStack<NavKey>,viewmodel:NoteViewModel=viewModel
                     backStack.add(Note)
                 },
                 shape=fabShape,
+                containerColor= fabColor,
                 contentColor=MaterialTheme.colorScheme.onSurface,
                 interactionSource=interactSource){
                 Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))

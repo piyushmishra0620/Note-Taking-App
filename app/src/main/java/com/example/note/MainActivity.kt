@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.animation.*
 import androidx.activity.*
 import androidx.activity.compose.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import com.example.note.ui.theme.NoteTheme
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.ui.unit.*
 import androidx.compose.material.icons.Icons
@@ -19,33 +17,26 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.text.font.FontWeight
-import com.example.note.ui.theme.borderStroke
-import com.example.note.ui.theme.fabColor
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.animation.core.*
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.navigation3.runtime.*;
-import androidx.navigation3.ui.*;
-import androidx.navigation3.scene.*;
-import com.example.note.navigation.*;
-import com.example.note.screens.*;
+import androidx.navigation3.runtime.*
+import androidx.navigation3.ui.*
+import androidx.navigation3.scene.*
+import com.example.note.navigation.*
+import com.example.note.screens.*
 import com.example.note.NoteApplication
 import com.example.note.viewmodels.*
-import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.*
+import androidx.compose.animation.*
 
 class MainActivity : ComponentActivity() {
 
-    val app = application as NoteApplication;
+    private val app by lazy { application as NoteApplication }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +52,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val noteViewModel : NoteViewModel = viewModel(factory=app.noteViewModel)
             val todoViewModel:TodoViewModel = viewModel(factory=app.todoViewModel)
-            val backStack = rememberNavBackStack(Notes);
+            val backStack = rememberNavBackStack(Notes)
             val currentScreen = backStack.lastOrNull()
             NoteTheme {
                 Scaffold(
@@ -92,7 +83,7 @@ class MainActivity : ComponentActivity() {
                                     Spacer(Modifier.weight(0.25f))
                                     IconButton(onClick = {
                                         if (backStack.lastOrNull() != Notes) {
-                                            backStack.add(Notes);
+                                            backStack.add(Notes)
                                         }
                                     }, Modifier.size(50.dp)) {
                                         Column(
@@ -115,7 +106,7 @@ class MainActivity : ComponentActivity() {
                                     Spacer(Modifier.weight(0.5f))
                                     IconButton(onClick = {
                                         if (backStack.lastOrNull() != Todos) {
-                                            backStack.add(Todos);
+                                            backStack.add(Todos)
                                         }
                                     }, Modifier.size(53.dp)) {
                                         Column(
@@ -141,7 +132,7 @@ class MainActivity : ComponentActivity() {
                                 containerColor = MaterialTheme.colorScheme.onPrimary
                             )
                         }
-                    }) { innerPadding ->
+                    }) {innerPadding->
                     NavDisplay(
                         backStack = backStack,
                         onBack = {
@@ -155,13 +146,25 @@ class MainActivity : ComponentActivity() {
                                 TodoScreen(todoViewModel)
                             }
                             entry<Note> {
-                                Note()
+                                Note(backStack,noteViewModel)
                             }
                             entry<Search> {
                                 Search()
                             }
                         },
-                        modifier = Modifier.padding(innerPadding)
+                        transitionSpec={
+                            slideInHorizontally { it } + fadeIn() togetherWith
+                                    slideOutHorizontally {-it} + fadeOut()
+                        },
+                        popTransitionSpec={
+                            slideInHorizontally {-it} + fadeIn() togetherWith
+                                    slideOutHorizontally {it} + fadeOut()
+                        },
+                        predictivePopTransitionSpec={
+                            slideInHorizontally {-it} + fadeIn() togetherWith
+                                    slideOutHorizontally {it} + fadeOut()
+                        },
+                        modifier = Modifier.padding(bottom=innerPadding.calculateBottomPadding())
                     )
                 }
             }
