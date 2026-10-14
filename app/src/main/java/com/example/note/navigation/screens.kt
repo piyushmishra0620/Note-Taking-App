@@ -4,13 +4,16 @@ import kotlinx.serialization.*;
 import androidx.navigation3.runtime.*;
 
 @Serializable
-data object Notes: NavKey
+sealed interface AppScreen:NavKey
 
 @Serializable
-data object Todos: NavKey
+data object Notes: AppScreen
 
 @Serializable
-data object Note: NavKey
+data object Todos: AppScreen
 
 @Serializable
-data object Search: NavKey
+data object Note: AppScreen
+
+@Serializable
+data object Search: AppScreen

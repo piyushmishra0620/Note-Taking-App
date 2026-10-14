@@ -1,16 +1,14 @@
 package com.example.note
 
 import android.app.Application
-import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.*
-import androidx.room.*
 import com.example.note.data.local.databases.AppDatabase
 import com.example.note.data.repository.*
 import com.example.note.viewmodels.*
 
 class NoteApplication:Application() {
     val db by lazy{
-        Room.databaseBuilder(applicationContext,AppDatabase::class.java,"app_database").build()
+        AppDatabase.getInstance(this)
     }
     val noteRepository by lazy{
         NoteRepository(db.noteDao())

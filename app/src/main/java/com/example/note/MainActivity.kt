@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.animation.*
 import androidx.activity.*
 import androidx.activity.compose.*
+import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.note.ui.theme.NoteTheme
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.ui.unit.*
@@ -33,6 +36,11 @@ import com.example.note.NoteApplication
 import com.example.note.viewmodels.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
+import com.example.note.ui.theme.fabColor
+import kotlinx.serialization.modules.*
+import kotlinx.serialization.*
 
 class MainActivity : ComponentActivity() {
 
@@ -42,9 +50,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashscreen = installSplashScreen()
         splashscreen.setOnExitAnimationListener { splashScreenView ->
-            splashScreenView.view.animate().setStartDelay(20).setDuration(80).alpha(0f).scaleX(0f)
+            splashScreenView.view.animate().setDuration(150).alpha(0f).scaleX(0f)
                 .scaleY(0f)
-                .setInterpolator(DecelerateInterpolator())
+                .setInterpolator(AccelerateDecelerateInterpolator())
                 .withEndAction { splashScreenView.remove() }.start()
         }
         super.onCreate(savedInstanceState)
@@ -52,118 +60,133 @@ class MainActivity : ComponentActivity() {
         setContent {
             val noteViewModel : NoteViewModel = viewModel(factory=app.noteViewModel)
             val todoViewModel:TodoViewModel = viewModel(factory=app.todoViewModel)
-            val backStack = rememberNavBackStack(Notes)
-            val currentScreen = backStack.lastOrNull()
+            val navigationState = rememberNavigationState(Notes,listOf(Notes,Todos))
+            val navigator = remember{
+                Navigator(navigationState)
+            }
             NoteTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (currentScreen is Notes || currentScreen is Todos) {
-                            BottomAppBar(
-                                modifier = Modifier
-                                    .height(115.dp)
-                                    .padding(bottom = 15.dp, start = 15.dp, end = 15.dp, top = 8.dp)
-                                    .navigationBarsPadding()
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .border(
-                                        2.dp,
-                                        MaterialTheme.colorScheme.onSecondary,
-                                        shape = RoundedCornerShape(20.dp)
-                                    )
-                                    .dropShadow(
-                                        shape = RoundedCornerShape(20.dp),
-                                        shadow = Shadow(
-                                            radius = 5.dp,
-                                            spread = 1.dp,
-                                            color = Color.Black,
-                                            offset = DpOffset(x = 3.dp, y = 3.dp)
-                                        )
-                                    ),
-                                actions = {
-                                    Spacer(Modifier.weight(0.25f))
-                                    IconButton(onClick = {
-                                        if (backStack.lastOrNull() != Notes) {
-                                            backStack.add(Notes)
-                                        }
-                                    }, Modifier.size(50.dp)) {
-                                        Column(
-                                            Modifier,
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Icon(
-                                                Icons.Filled.EditNote,
-                                                contentDescription = "Notes",
-                                                modifier = Modifier.size(28.dp)
-                                            )
-                                            Text(
-                                                text = "Notes",
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Normal
-                                            )
-                                        }
-                                    }
-                                    Spacer(Modifier.weight(0.5f))
-                                    IconButton(onClick = {
-                                        if (backStack.lastOrNull() != Todos) {
-                                            backStack.add(Todos)
-                                        }
-                                    }, Modifier.size(53.dp)) {
-                                        Column(
-                                            Modifier,
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Icon(
-                                                Icons.Filled.Task,
-                                                contentDescription = "Todo",
-                                                modifier = Modifier.size(28.dp)
-                                            )
-                                            Text(
-                                                text = "To-dos",
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Normal
-                                            )
-                                        }
-                                    }
-                                    Spacer(Modifier.weight(0.25f))
-                                },
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                containerColor = MaterialTheme.colorScheme.onPrimary
+                            AnimatedVisibility(visible=(navigationState.backStacks[navigationState.topLevelDestination]?.last()==Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last()==Todos)){
+                                TopNavBar(Modifier,selectedKey=navigationState.topLevelDestination,onSelectedKey={navigator.navigate(it)})
+                            }
+                    },
+                    floatingActionButton={
+                        if(navigationState.backStacks[navigationState.topLevelDestination]?.last() is Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last() is Todos){
+                            val interactSource = remember{MutableInteractionSource()}
+                            val pressed by interactSource.collectIsPressedAsState()
+                            val scale by animateFloatAsState(
+                                targetValue = if (pressed) 0.88f else 1f,
+                                label="button_scale",
+                                animationSpec=spring(stiffness=Spring.StiffnessLow,
+                                    dampingRatio=Spring.DampingRatioLowBouncy)
                             )
+                            val fabShape = RoundedCornerShape(50.dp)
+                            AnimatedVisibility(visible=(navigationState.backStacks[navigationState.topLevelDestination]?.last() is Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last() is Todos),enter=scaleIn(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))+fadeIn(animationSpec=tween(durationMillis=500,delayMillis=700,easing=LinearOutSlowInEasing)),exit=scaleOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))+fadeOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))) {
+                                FloatingActionButton(modifier=Modifier.clickable(interactionSource=interactSource,indication=null,onClick={}).scale(scale).dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107))).border(1.dp,MaterialTheme.colorScheme.onSurface,fabShape),
+                                    onClick={
+                                        if(navigationState.topLevelDestination==Notes){
+                                            navigationState.backStacks[navigationState.topLevelDestination]?.add(Note)
+                                        }else if(navigationState.topLevelDestination==Todos){
+                                        }
+                                    },
+                                    shape=fabShape,
+                                    containerColor= fabColor,
+                                    contentColor=MaterialTheme.colorScheme.onSurface,
+                                    interactionSource=interactSource){
+                                    Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
+                                }
+                            }
                         }
-                    }) {innerPadding->
+                    },
+                    floatingActionButtonPosition=FabPosition.End){innerPadding->
+                    val currentBackStack=navigationState.backStacks[navigationState.topLevelDestination]?:navigationState.backStacks.getValue(Notes)
                     NavDisplay(
-                        backStack = backStack,
-                        onBack = {
-                            backStack.removeLastOrNull()
-                        },
-                        entryProvider = entryProvider {
+                        entries = navigationState.toEntries(entryProvider {
                             entry<Notes> {
-                                NoteScreen(backStack,noteViewModel)
+                                NoteScreen(currentBackStack,noteViewModel,navigationState.topLevelDestination== Notes)
                             }
                             entry<Todos> {
-                                TodoScreen(todoViewModel)
+                                TodoScreen(currentBackStack,todoViewModel,navigationState.topLevelDestination==Todos)
                             }
-                            entry<Note> {
-                                Note(backStack,noteViewModel)
+                            entry<Note>(metadata=NavDisplay.transitionSpec{
+                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                            }+NavDisplay.popTransitionSpec{
+                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                            }+NavDisplay.predictivePopTransitionSpec{
+                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                            }) {
+                                Note(currentBackStack,noteViewModel,currentBackStack.last()==Note)
                             }
-                            entry<Search> {
-                                Search()
+                            entry<Search>(metadata=NavDisplay.transitionSpec{
+                                slideIn(animationSpec=tween(durationMillis=300,easing=CubicBezierEasing(0.0f,0f,0.2f,1f))){fullSize-> IntOffset(fullSize.width-5,-(fullSize.height))} + fadeIn(animationSpec = tween(durationMillis = 300))  togetherWith slideOut(animationSpec = tween(durationMillis = 300, easing = CubicBezierEasing(0.0f, 0f, 0.2f, 1f))){fullSize->IntOffset(fullSize.width-5,-(fullSize.height-5))} + fadeOut(animationSpec = tween(durationMillis = 300))
+                            }+ NavDisplay.popTransitionSpec{
+                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300))
+                            }+ NavDisplay.predictivePopTransitionSpec{
+                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300)){it} + fadeOut(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing))
+                            }) {
+                                Search(currentBackStack,noteViewModel)
                             }
-                        },
+                        }),
                         transitionSpec={
-                            slideInHorizontally { it } + fadeIn() togetherWith
-                                    slideOutHorizontally {-it} + fadeOut()
+                            val current = initialState.key.toString()
+                            val target = targetState.key.toString()
+                            val currentIndex=when{
+                                current.contains("Notes")->0
+                                current.contains("Todos")->1
+                                else -> -1
+                            }
+                            val targetIndex=when{
+                                target.contains("Notes")->0
+                                target.contains("Todos")->1
+                                else -> -1
+                            }
+                            if(currentIndex!=-1 && targetIndex!=-1 && currentIndex>targetIndex){
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={width->-(width)})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX = {width->(width)})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }else{
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={width->width})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX ={width->-(width)})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }
                         },
                         popTransitionSpec={
-                            slideInHorizontally {-it} + fadeIn() togetherWith
-                                    slideOutHorizontally {it} + fadeOut()
+                            val current = initialState.key.toString()
+                            val target = targetState.key.toString()
+                            val currentIndex=when{
+                                current.contains("navigation.Notes") || current=="Notes"->0
+                                current.contains("navigation.Todos") || current=="Todos"->1
+                                else -> -1
+                            }
+                            val targetIndex=when{
+                                target.contains("navigation.Notes") || target=="Notes" ->0
+                                target.contains("navigation.Todos") || target=="Todos"->1
+                                else -> -1
+                            }
+                            if(currentIndex!=-1 && targetIndex!=-1 && currentIndex<targetIndex){
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={it})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX = {-it})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }else{
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={-it})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX ={it})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }
                         },
                         predictivePopTransitionSpec={
-                            slideInHorizontally {-it} + fadeIn() togetherWith
-                                    slideOutHorizontally {it} + fadeOut()
+                            val current = initialState.key.toString()
+                            val target = targetState.key.toString()
+                            val currentIndex=when{
+                                current.contains("navigation.Notes") || current=="Notes"->0
+                                current.contains("navigation.Todos") || current=="Todos"->1
+                                else -> -1
+                            }
+                            val targetIndex=when{
+                                target.contains("navigation.Notes") || target=="Notes" ->0
+                                target.contains("navigation.Todos") || target=="Todos"->1
+                                else -> -1
+                            }
+                            if(currentIndex!=-1 && targetIndex!=-1 && currentIndex<targetIndex){
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={it})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX = {-it})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }else{
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250),initialOffsetX={-it})+fadeIn(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250), targetOffsetX ={it})+fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=250))
+                            }
                         },
+                        onBack = navigator::goBack,
                         modifier = Modifier.padding(bottom=innerPadding.calculateBottomPadding())
                     )
                 }

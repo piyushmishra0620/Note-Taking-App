@@ -9,12 +9,18 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.modifier.*
 import androidx.compose.ui.unit.*
+import androidx.navigation3.runtime.*
+import androidx.navigation3.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.note.data.local.entities.Notes
+import com.example.note.viewmodels.*
+import com.example.note.navigation.*
 
 @Composable
-fun Search(){}
+fun Search(stack:NavBackStack<NavKey>,viewModel:NoteViewModel=viewModel()){}
 
 @Preview
 @Composable
 fun SearchPreview(){
-    Search()
+    Search(rememberNavBackStack(Notes),viewModel())
 }

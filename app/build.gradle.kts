@@ -64,6 +64,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.paging)
+    implementation(libs.ui.graphics)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.sqlite.bundled)
 
