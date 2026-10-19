@@ -34,7 +34,7 @@ import com.example.note.viewmodels.NoteViewModel
 @Composable
 fun NoteScreen(backStack: NavBackStack<NavKey>,viewmodel:NoteViewModel=viewModel(),isSelected:Boolean){
     Scaffold(modifier=Modifier.fillMaxSize(),topBar={
-        AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=200)),exit=fadeOut(animationSpec=tween(durationMillis=300,delayMillis=200,easing=LinearOutSlowInEasing))){
+        AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)),exit=fadeOut(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing))){
             TopAppBar(title={
                 Text(text="Notes",fontWeight=FontWeight.Bold,fontSize=25.sp)
             },actions={

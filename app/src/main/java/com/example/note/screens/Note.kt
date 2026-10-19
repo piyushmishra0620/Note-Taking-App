@@ -107,7 +107,7 @@ fun Note(navBackStack:NavBackStack<NavKey>,viewModel:NoteViewModel= viewModel(),
             }
         },
         bottomBar = {
-            AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,delayMillis=200,easing=LinearOutSlowInEasing)),exit=fadeOut(animationSpec=tween(durationMillis=100,delayMillis=0,easing=LinearOutSlowInEasing))){
+            AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,delayMillis=0,easing=LinearOutSlowInEasing)),exit=fadeOut(animationSpec=tween(durationMillis=100,delayMillis=0,easing=LinearOutSlowInEasing))){
                 BottomAppBar(
                     modifier=Modifier.height(115.dp).padding(bottom=15.dp,start=55.dp,end=55.dp,top=25.dp).navigationBarsPadding().clip(RoundedCornerShape(40.dp)).border(1.dp,MaterialTheme.colorScheme.onSecondary,shape=RoundedCornerShape(40.dp)).dropShadow(shape= RoundedCornerShape(20.dp),shadow=Shadow(radius=5.dp,spread=1.dp,color=Color.Black,offset=DpOffset(x=3.dp,y=3.dp))),
                     actions={

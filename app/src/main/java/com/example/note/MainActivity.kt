@@ -83,19 +83,91 @@ class MainActivity : ComponentActivity() {
                                     dampingRatio=Spring.DampingRatioLowBouncy)
                             )
                             val fabShape = RoundedCornerShape(50.dp)
-                            AnimatedVisibility(visible=(navigationState.backStacks[navigationState.topLevelDestination]?.last() is Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last() is Todos),enter=scaleIn(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))+fadeIn(animationSpec=tween(durationMillis=500,delayMillis=700,easing=LinearOutSlowInEasing)),exit=scaleOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))+fadeOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=700))) {
-                                FloatingActionButton(modifier=Modifier.clickable(interactionSource=interactSource,indication=null,onClick={}).scale(scale).dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107))).border(1.dp,MaterialTheme.colorScheme.onSurface,fabShape),
-                                    onClick={
-                                        if(navigationState.topLevelDestination==Notes){
-                                            navigationState.backStacks[navigationState.topLevelDestination]?.add(Note)
-                                        }else if(navigationState.topLevelDestination==Todos){
+                            AnimatedContent(targetState=navigationState.topLevelDestination,modifier=Modifier,transitionSpec={scaleIn(animationSpec=tween(durationMillis=300,delayMillis=20,easing=LinearEasing))+fadeIn(animationSpec=tween(durationMillis=300,delayMillis=20,easing=LinearEasing)) togetherWith scaleOut(animationSpec=tween(durationMillis=300,delayMillis=20,easing=LinearEasing))+fadeOut(animationSpec=tween(durationMillis=300,delayMillis=20,easing=LinearEasing))}){
+                                when(it){
+                                    Notes->{
+                                    AnimatedVisibility(visible=(navigationState.backStacks[navigationState.topLevelDestination]?.last() is Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last() is Todos),enter=scaleIn(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=50))+fadeIn(animationSpec=tween(durationMillis=500,delayMillis=50,easing=LinearOutSlowInEasing)),exit=scaleOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=50))+fadeOut(animationSpec=tween(durationMillis=500,easing=LinearOutSlowInEasing,delayMillis=50))) {
+                                        FloatingActionButton(modifier=Modifier.clickable(interactionSource=interactSource,indication=null,onClick={}).scale(scale).dropShadow(shape=RoundedCornerShape(50.dp),shadow=Shadow(radius=4.dp,spread=1.dp,color=Color(0xFFFFC107))).border(1.dp,MaterialTheme.colorScheme.onSurface,fabShape),
+                                            onClick={
+                                                if(navigationState.topLevelDestination==Notes){
+                                                    navigationState.backStacks[navigationState.topLevelDestination]?.add(Note)
+                                                }else if(navigationState.topLevelDestination==Todos){
+                                                }
+                                            },
+                                            shape=fabShape,
+                                            containerColor= fabColor,
+                                            contentColor=MaterialTheme.colorScheme.onSurface,
+                                            interactionSource=interactSource){
+                                            Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
                                         }
-                                    },
-                                    shape=fabShape,
-                                    containerColor= fabColor,
-                                    contentColor=MaterialTheme.colorScheme.onSurface,
-                                    interactionSource=interactSource){
-                                    Icon(Icons.Filled.Add,contentDescription="Add",modifier=Modifier.size(43.dp))
+                                    }}
+                                    Todos-> {
+                                        AnimatedVisibility(
+                                            visible = (navigationState.backStacks[navigationState.topLevelDestination]?.last() is Notes || navigationState.backStacks[navigationState.topLevelDestination]?.last() is Todos),
+                                            enter = scaleIn(
+                                                animationSpec = tween(
+                                                    durationMillis = 500,
+                                                    easing = LinearOutSlowInEasing,
+                                                    delayMillis = 50
+                                                )
+                                            ) + fadeIn(
+                                                animationSpec = tween(
+                                                    durationMillis = 500,
+                                                    delayMillis = 50,
+                                                    easing = LinearOutSlowInEasing
+                                                )
+                                            ),
+                                            exit = scaleOut(
+                                                animationSpec = tween(
+                                                    durationMillis = 500,
+                                                    easing = LinearOutSlowInEasing,
+                                                    delayMillis = 50
+                                                )
+                                            ) + fadeOut(
+                                                animationSpec = tween(
+                                                    durationMillis = 500,
+                                                    easing = LinearOutSlowInEasing,
+                                                    delayMillis = 50
+                                                )
+                                            )
+                                        ) {
+                                            FloatingActionButton(
+                                                modifier = Modifier.clickable(
+                                                    interactionSource = interactSource,
+                                                    indication = null,
+                                                    onClick = {}).scale(scale).dropShadow(
+                                                    shape = RoundedCornerShape(50.dp),
+                                                    shadow = Shadow(
+                                                        radius = 4.dp,
+                                                        spread = 1.dp,
+                                                        color = Color(0xFFFFC107)
+                                                    )
+                                                ).border(
+                                                    1.dp,
+                                                    MaterialTheme.colorScheme.onSurface,
+                                                    fabShape
+                                                ),
+                                                onClick = {
+                                                    if (navigationState.topLevelDestination == Notes) {
+                                                        navigationState.backStacks[navigationState.topLevelDestination]?.add(
+                                                            Note
+                                                        )
+                                                    } else if (navigationState.topLevelDestination == Todos) {
+                                                    }
+                                                },
+                                                shape = fabShape,
+                                                containerColor = fabColor,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                                interactionSource = interactSource
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.Add,
+                                                    contentDescription = "Add",
+                                                    modifier = Modifier.size(43.dp)
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -111,20 +183,20 @@ class MainActivity : ComponentActivity() {
                                 TodoScreen(currentBackStack,todoViewModel,navigationState.topLevelDestination==Todos)
                             }
                             entry<Note>(metadata=NavDisplay.transitionSpec{
-                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeIn(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100))
                             }+NavDisplay.popTransitionSpec{
-                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100))
                             }+NavDisplay.predictivePopTransitionSpec{
-                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100))
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100))
                             }) {
                                 Note(currentBackStack,noteViewModel,currentBackStack.last()==Note)
                             }
                             entry<Search>(metadata=NavDisplay.transitionSpec{
-                                slideIn(animationSpec=tween(durationMillis=300,easing=CubicBezierEasing(0.0f,0f,0.2f,1f))){fullSize-> IntOffset(fullSize.width-5,-(fullSize.height))} + fadeIn(animationSpec = tween(durationMillis = 300))  togetherWith slideOut(animationSpec = tween(durationMillis = 300, easing = CubicBezierEasing(0.0f, 0f, 0.2f, 1f))){fullSize->IntOffset(fullSize.width-5,-(fullSize.height-5))} + fadeOut(animationSpec = tween(durationMillis = 300))
+                                slideIn(animationSpec=tween(durationMillis=120,easing=CubicBezierEasing(0.0f,0f,0.2f,1f))){fullSize-> IntOffset(fullSize.width-5,-(fullSize.height))} + fadeIn(animationSpec = tween(durationMillis = 120))  togetherWith slideOut(animationSpec = tween(durationMillis = 120, easing = CubicBezierEasing(0.0f, 0f, 0.2f, 1f))){fullSize->IntOffset(fullSize.width-5,-(fullSize.height-5))} + fadeOut(animationSpec = tween(durationMillis = 120))
                             }+ NavDisplay.popTransitionSpec{
-                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300))
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100))
                             }+ NavDisplay.predictivePopTransitionSpec{
-                                slideInHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300)){-it} + fadeIn(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=300,easing=LinearOutSlowInEasing,delayMillis=300)){it} + fadeOut(animationSpec=tween(durationMillis=300,delayMillis=300,easing=LinearOutSlowInEasing))
+                                slideInHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){-it} + fadeIn(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing)) togetherWith slideOutHorizontally(animationSpec=tween(durationMillis=120,easing=LinearOutSlowInEasing,delayMillis=100)){it} + fadeOut(animationSpec=tween(durationMillis=120,delayMillis=100,easing=LinearOutSlowInEasing))
                             }) {
                                 Search(currentBackStack,noteViewModel)
                             }

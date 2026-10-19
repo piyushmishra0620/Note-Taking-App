@@ -35,7 +35,7 @@ import com.example.note.navigation.Todos
 fun TodoScreen(backStack:NavBackStack<NavKey>,todoViewModel:TodoViewModel=viewModel(),isSelected:Boolean){
     Scaffold(
         topBar={
-            AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,delayMillis=200,easing=LinearOutSlowInEasing)),exit=fadeOut(animationSpec=tween(durationMillis=300,delayMillis=200,easing=LinearOutSlowInEasing))){
+            AnimatedVisibility(visible=isSelected,modifier=Modifier,enter=fadeIn(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing)),exit=fadeOut(animationSpec=tween(durationMillis=300,delayMillis=100,easing=LinearOutSlowInEasing))){
                 TopAppBar(
                     title={Text("To-dos",fontWeight=FontWeight.Bold,fontSize=26.sp)},
                     actions={
