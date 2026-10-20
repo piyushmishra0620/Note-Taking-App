@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.*
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.material.icons.rounded.AutoFixHigh
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.*
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -114,7 +116,11 @@ fun Note(navBackStack:NavBackStack<NavKey>,viewModel:NoteViewModel= viewModel(),
                         Row(verticalAlignment=Alignment.CenterVertically){
                             Spacer(modifier=Modifier.weight(0.1f))
                             IconButton(onClick={}){
-                                Icon(Icons.Filled.Edit,contentDescription="Edit Note",modifier=Modifier.size(24.dp))
+                                Icon(Icons.Rounded.AutoFixHigh,contentDescription="Edit Note",modifier=Modifier.size(24.dp))
+                            }
+                            Spacer(modifier=Modifier.weight(0.1f))
+                            IconButton(onClick={}){
+                                Icon(Icons.Rounded.AutoAwesome,contentDescription="Summarization",modifier=Modifier.size(24.dp))
                             }
                             Spacer(modifier=Modifier.weight(0.1f))
                             IconButton(onClick={}){
